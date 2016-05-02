@@ -1,0 +1,41 @@
+#######################################
+# Syntax Coloring Map For MessageStream
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+MessageStream	KEYWORD1
+I2cMessageStream	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+#MessageStream
+readRequest	KEYWORD2
+writeResponse	KEYWORD2
+receiveRequest	KEYWORD2
+writeRequest	KEYWORD2
+readResponse	KEYWORD2
+isAvailable	KEYWORD2
+_setStatus	KEYWORD2
+
+#I2cMessageStream
+writeRequest	KEYWORD2
+receiveRequest	KEYWORD2
+sendResponse	KEYWORD2
+readResponse	KEYWORD2
+getI2cAddress	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+#MessageStream
+SUCCESS_MESSAGE_STATUS	LITERAL1
+FAILED_MESSAGE_STATUS	LITERAL1
+PENDING_MESSAGE_STATUS	LITERAL1
+NO_DATA_MESSAGE_STATUS	LITERAL1
