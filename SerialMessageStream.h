@@ -3,20 +3,26 @@
 
 #include <Arduino.h>
 #include <MessageStream.h>
-// #define DEBUG_MESSAGE_STREAM
+//#define DEBUG_MESSAGE_STREAM
 
 class SerialMessageStream : public MessageStream {
   protected:
-    HardwareSerial * _stream;
+    HardwareSerial& _serial;
     byte _countResponse = 0;
     byte _countRequest = 0;
     char _requestAccumulator[_requestBufferSize];
   
   public:
-    SerialMessageStream(HardwareSerial * stream) : _stream(stream), MessageStream() { }
+    SerialMessageStream(HardwareSerial& serial) : _serial(serial), MessageStream() { }
 
     void writeRequest(char * request) {
-      _stream->write(request);
+#ifdef DEBUG_MESSAGE_STREAM
+Serial.print(F("SerialMessageStream::writeRequest Atempting to writeRequest: "));      
+Serial.println(request);      
+#endif
+
+      _serial.println(request);
+      
       _responseBuffer[0] = PENDING_MESSAGE_STATUS;
     } 
     
@@ -24,9 +30,9 @@ class SerialMessageStream : public MessageStream {
       //byte countRequest = 0;
       bool _requestAccumulated = false;
       
-      while(_stream->available()) {
+      while(_serial.available()) {
         if (_countRequest < (_requestBufferSize +1)) {
-          _requestAccumulator[_countRequest] = _stream->read();
+          _requestAccumulator[_countRequest] = _serial.read();
 
           #ifdef DEBUG_MESSAGE_STREAM
           Serial.print(_requestAccumulator[_countRequest]);
@@ -45,7 +51,7 @@ class SerialMessageStream : public MessageStream {
 
         }
 //        else {
-//          _stream->read(); // ignore over-run
+//          _serial.read(); // ignore over-run
 //        }
         
       }
@@ -68,8 +74,8 @@ class SerialMessageStream : public MessageStream {
     
     
     void sendResponse() { 
-      _stream->write(_responseBuffer);
-      _stream->write('\n');
+      _serial.write(_responseBuffer);
+      _serial.write('\n');
       
       _setStatus(NO_DATA_MESSAGE_STATUS);
     }
@@ -82,8 +88,8 @@ class SerialMessageStream : public MessageStream {
     void receiveResponse() {
       char c;
       
-      while(_stream->available()) {
-        c = _stream->read();
+      while(_serial.available()) {
+        c = _serial.read();
         if (_countResponse < (_responseBufferSize +1)) {
           _responseBuffer[_countResponse] = c;
           _countResponse++;
