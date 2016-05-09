@@ -1,20 +1,39 @@
+/** @file SerialMessageStream.h 
+  *  Copyright (c) 2016 Ozbotics 
+  *  Distributed under the MIT license (see LICENSE)
+  */ 
 #ifndef SERIAL_MESSAGE_STREAM_H
-#define SERIAL_MESSAGE_STREAM_H
+ #define SERIAL_MESSAGE_STREAM_H
 
 #include <Arduino.h>
 #include <MessageStream.h>
 //#define DEBUG_MESSAGE_STREAM
 
+/**
+ * Implements MessageStream over Serial
+ *
+ * Provides the MessageStream interface over Serial
+ */
 class SerialMessageStream : public MessageStream {
   protected:
-    HardwareSerial& _serial;
-    byte _countResponse = 0;
-    byte _countRequest = 0;
-    char _requestAccumulator[_requestBufferSize];
+    HardwareSerial& _serial;                        /**< protected variable  _serial The serial stream */ 
+    byte _countResponse = 0;                        /**< protected variable  _countResponse The response string length */ 
+    byte _countRequest = 0;                         /**< protected variable  _countRequest The request string length */ 
+    char _requestAccumulator[_requestBufferSize];   /**< protected variable  _requestAccumulator Buffer to accumulate incoming string */ 
   
   public:
+   /**
+    * Constructor
+    *
+    * @param serial The serial stream
+   */
     SerialMessageStream(HardwareSerial& serial) : _serial(serial), MessageStream() { }
 
+   /**
+    * Called when a Request is sent
+    *
+    * @param request The outgoing request string
+    */
     void writeRequest(char * request) {
 #ifdef DEBUG_MESSAGE_STREAM
 Serial.print(F("SerialMessageStream::writeRequest Atempting to writeRequest: "));      
@@ -26,8 +45,10 @@ Serial.println(request);
       _responseBuffer[0] = PENDING_MESSAGE_STATUS;
     } 
     
+   /**
+    * Called when a Request is incoming
+    */
     void receiveRequest() { 
-      //byte countRequest = 0;
       bool _requestAccumulated = false;
       
       while(_serial.available()) {
@@ -48,12 +69,7 @@ Serial.println(request);
           }
           
           _countRequest++;
-
         }
-//        else {
-//          _serial.read(); // ignore over-run
-//        }
-        
       }
 
       if (_requestAccumulated == true) {
@@ -72,7 +88,9 @@ Serial.println(request);
     }
 
     
-    
+   /**
+    * Called when a Response is outgoing
+    */
     void sendResponse() { 
       _serial.write(_responseBuffer);
       _serial.write('\n');
@@ -80,11 +98,18 @@ Serial.println(request);
       _setStatus(NO_DATA_MESSAGE_STATUS);
     }
 
+    
+   /**
+    * Called to send a Response
+    */
     void writeResponse(char * response, byte _status = SUCCESS_MESSAGE_STATUS){
       MessageStream::writeResponse(response, _status);
       sendResponse();
     }
     
+   /**
+    * Called when a Response is incoming
+    */
     void receiveResponse() {
       char c;
       
@@ -111,9 +136,17 @@ Serial.println(request);
       }
     }
 
+   /**
+    * Called when a Reaponae is incoming
+    *
+    * subclasses are required to implement readResponse()
+    *
+    * @param response The incoming response string
+    * @param responseSize The expected size of the response string
+    */
     MessageStatus readResponse(char * response,  byte responseSize) {
 #ifdef DEBUG_MESSAGE_STREAM
-        Serial.print(F("readResponse: "));
+      Serial.print(F("readResponse: "));
       Serial.print((byte) _responseBuffer[0]);
       Serial.print(F(", "));
       Serial.println(_responseBuffer+1);
