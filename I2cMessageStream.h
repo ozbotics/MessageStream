@@ -28,7 +28,7 @@ class I2cMessageStream : public MessageStream {
     */
     I2cMessageStream(byte myI2cAddr = 0, byte targetI2cAddr = 0);
     
-    /**
+   /**
     * Called when a Request is sent
     *
     * @param request The outgoing request string
