@@ -53,6 +53,7 @@ class MessageStream {
     virtual void writeResponse(char * response, byte status = SUCCESS_MESSAGE_STATUS) { 
       _responseBuffer[0] = status;
       strcpy(_responseBuffer+1, response);
+      
       _setStatus(status);
     }
 
